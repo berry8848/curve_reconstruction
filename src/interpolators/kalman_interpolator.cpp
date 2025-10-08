@@ -1,4 +1,4 @@
-#include "kalman_interpolator.h"
+#include "interpolators/kalman_interpolator.h"
 #include <sstream>
 #include <iomanip>
 

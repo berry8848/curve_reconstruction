@@ -1,4 +1,4 @@
-#include "image_utils.h"
+#include "utils/image_utils.h"
 #include <fstream>
 #include <array>
 #include <algorithm>

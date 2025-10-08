@@ -17,12 +17,17 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # プロジェクトファイルをコピー
-COPY . .
+COPY CMakeLists.txt ./
+COPY include ./include
+COPY src ./src
 
 # ビルドディレクトリを作成してビルド
 RUN mkdir -p build && cd build && \
     cmake .. && \
     make
 
+# 作業ディレクトリをbuildに変更
+WORKDIR /app/build
+
 # 実行時のデフォルトコマンド
-CMD ["./build/lane_curve"]
+CMD ["./lane_curve"]

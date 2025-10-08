@@ -1,4 +1,4 @@
-#include "line_segment.h"
+#include "interpolators/line_segment.h"
 
 void extractPoints(const std::vector<LineSegment>& segments, 
                    std::vector<std::pair<double, double>>& points) {

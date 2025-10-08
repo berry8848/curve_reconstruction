@@ -1,0 +1,26 @@
+# ビルド成果物
+build/
+*.o
+*.so
+*.a
+
+# 出力ファイル
+output/
+*.ppm
+
+# Git関連
+.git/
+.gitignore
+
+# エディタ関連
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# その他
+README.md

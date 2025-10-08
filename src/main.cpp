@@ -1,9 +1,9 @@
 #include <iostream>
 #include <memory>
-#include "interpolator.h"
-#include "kalman_interpolator.h"
-#include "line_segment.h"
-#include "image_utils.h"
+#include "interpolators/interpolator.h"
+#include "interpolators/kalman_interpolator.h"
+#include "interpolators/line_segment.h"
+#include "utils/image_utils.h"
 
 int main() {
     std::vector<LineSegment> segments = {
