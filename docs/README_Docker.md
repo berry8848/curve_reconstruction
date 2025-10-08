@@ -177,7 +177,7 @@ sudo apt-get install imagemagick  # Ubuntu/Debian
 brew install imagemagick          # macOS
 
 # 表示
-display lane_curve.ppm
+display ./output/lane_curve.ppm
 
 # PNG/JPGに変換
 convert lane_curve.ppm lane_curve.png
