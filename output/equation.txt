@@ -1,1 +1,0 @@
-Kalman Filter (Quadratic): y = -0.873506x^2 + -3.021359x + 9.855236

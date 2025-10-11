@@ -121,8 +121,8 @@ docker build --no-cache -t lane_curve:latest .
 ## 簡単な実行スクリプト
 実行権限を付与して実行：
 ```bash
-chmod +x run.sh
-./run.sh
+chmod +x docker-run.sh
+./docker-run.sh
 ```
 
 ## 出力ファイル

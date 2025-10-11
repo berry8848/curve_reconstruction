@@ -29,7 +29,7 @@ int main() {
     std::cout << equation << std::endl;
     
     // 関数式をファイルに保存
-    std::ofstream eq_file("equation.txt");
+    std::ofstream eq_file("output/equation.txt");
     eq_file << equation << std::endl;
     eq_file.close();
     
@@ -39,7 +39,7 @@ int main() {
         curve_points.push_back({x, y});
     }
     
-    saveToPPM("lane_curve.ppm", segments, curve_points);
+    saveToPPM("output/lane_curve.ppm", segments, curve_points);
     
     std::cout << "曲線画像を lane_curve.ppm として保存しました。" << std::endl;
     std::cout << "関数式を equation.txt として保存しました。" << std::endl;
