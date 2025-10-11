@@ -9,7 +9,7 @@ struct LineSegment {
     double x1, y1, x2, y2;
 };
 
-// 線分の中点を抽出
+// 線分の中点、始点、終点の順で抽出
 void extractPoints(const std::vector<LineSegment>& segments, 
                    std::vector<std::pair<double, double>>& points);
 
