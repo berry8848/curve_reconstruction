@@ -119,39 +119,6 @@ docker build --no-cache -t lane_curve:latest .
 ```
 
 ## 簡単な実行スクリプト
-
-以下の内容で`run.sh`を作成すると便利です：
-
-```bash
-#!/bin/bash
-
-# 出力ディレクトリを作成
-mkdir -p output
-
-# Dockerイメージをビルド
-echo "Building Docker image..."
-docker build -t lane_curve:latest .
-
-# コンテナを実行
-echo "Running container..."
-docker run -d --name lane_curve_tmp lane_curve:latest sleep 10
-
-# プログラムを実行
-echo "Executing program..."
-docker exec lane_curve_tmp ./lane_curve
-
-# 結果をコピー
-echo "Copying output file..."
-docker cp lane_curve_tmp:/app/build/lane_curve.ppm ./output/
-
-# コンテナをクリーンアップ
-echo "Cleaning up..."
-docker stop lane_curve_tmp
-docker rm lane_curve_tmp
-
-echo "Done! Output saved to ./output/lane_curve.ppm"
-```
-
 実行権限を付与して実行：
 ```bash
 chmod +x run.sh
@@ -180,7 +147,7 @@ brew install imagemagick          # macOS
 display ./output/lane_curve.ppm
 
 # PNG/JPGに変換
-convert lane_curve.ppm lane_curve.png
+convert ./output/lane_curve.ppm ./output/lane_curve.png
 ```
 
 ### GIMP（Windows/Linux/Mac）

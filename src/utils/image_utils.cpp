@@ -1,19 +1,36 @@
 #include "utils/image_utils.h"
 #include <fstream>
-#include <array>
 #include <algorithm>
 #include <cmath>
+#include <vector>
+#include <array>
 
 void saveToPPM(const std::string& filename, 
-               const std::vector<std::pair<double, double>>& original_points,
-               const std::vector<std::pair<double, double>>& curve_points, 
+               const std::vector<LineSegment>& segments,
+               const std::vector<std::pair<double, double>>& curve_points,
                int width, int height) {
     
     std::vector<std::vector<std::array<int, 3>>> image(
         height, std::vector<std::array<int, 3>>(width, {255, 255, 255}));
     
-    double min_x = 0, max_x = 100;
-    double min_y = 0, max_y = 100;
+    // データ範囲を計算
+    double min_x = 1e9, max_x = -1e9;
+    double min_y = 1e9, max_y = -1e9;
+    
+    for (const auto& seg : segments) {
+        min_x = std::min({min_x, seg.x1, seg.x2});
+        max_x = std::max({max_x, seg.x1, seg.x2});
+        min_y = std::min({min_y, seg.y1, seg.y2});
+        max_y = std::max({max_y, seg.y1, seg.y2});
+    }
+    
+    // マージンを追加
+    double range_x = max_x - min_x;
+    double range_y = max_y - min_y;
+    min_x -= range_x * 0.1;
+    max_x += range_x * 0.1;
+    min_y -= range_y * 0.1;
+    max_y += range_y * 0.1;
     
     auto transform = [&](double x, double y) -> std::pair<int, int> {
         int img_x = static_cast<int>((x - min_x) / (max_x - min_x) * (width - 1));
@@ -21,29 +38,8 @@ void saveToPPM(const std::string& filename,
         return {img_x, img_y};
     };
     
-    // 元の点を赤でプロット
-    for (const auto& pt : original_points) {
-        auto [img_x, img_y] = transform(pt.first, pt.second);
-        if (img_x >= 0 && img_x < width && img_y >= 0 && img_y < height) {
-            for (int dx = -2; dx <= 2; dx++) {
-                for (int dy = -2; dy <= 2; dy++) {
-                    if (std::abs(dx) + std::abs(dy) <= 2) {
-                        int nx = img_x + dx;
-                        int ny = img_y + dy;
-                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                            image[ny][nx] = {255, 0, 0};
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    // 復元曲線を青でプロット
-    for (size_t i = 1; i < curve_points.size(); i++) {
-        auto [x1, y1] = transform(curve_points[i-1].first, curve_points[i-1].second);
-        auto [x2, y2] = transform(curve_points[i].first, curve_points[i].second);
-        
+    // Bresenhamの直線描画アルゴリズム
+    auto drawLine = [&](int x1, int y1, int x2, int y2, int r, int g, int b, int thickness = 1) {
         int dx = std::abs(x2 - x1);
         int dy = std::abs(y2 - y1);
         int sx = (x1 < x2) ? 1 : -1;
@@ -52,8 +48,15 @@ void saveToPPM(const std::string& filename,
         
         int x = x1, y = y1;
         while (true) {
-            if (x >= 0 && x < width && y >= 0 && y < height) {
-                image[y][x] = {0, 0, 255};
+            // 太さを持たせる
+            for (int tx = -thickness; tx <= thickness; tx++) {
+                for (int ty = -thickness; ty <= thickness; ty++) {
+                    int px = x + tx;
+                    int py = y + ty;
+                    if (px >= 0 && px < width && py >= 0 && py < height) {
+                        image[py][px] = {r, g, b};
+                    }
+                }
             }
             
             if (x == x2 && y == y2) break;
@@ -68,8 +71,23 @@ void saveToPPM(const std::string& filename,
                 y += sy;
             }
         }
+    };
+    
+    // 元の線分を緑で描画
+    for (const auto& seg : segments) {
+        auto [x1, y1] = transform(seg.x1, seg.y1);
+        auto [x2, y2] = transform(seg.x2, seg.y2);
+        drawLine(x1, y1, x2, y2, 0, 200, 0, 2);
     }
     
+    // 復元曲線を青で描画
+    for (size_t i = 1; i < curve_points.size(); i++) {
+        auto [x1, y1] = transform(curve_points[i-1].first, curve_points[i-1].second);
+        auto [x2, y2] = transform(curve_points[i].first, curve_points[i].second);
+        drawLine(x1, y1, x2, y2, 0, 0, 255, 1);
+    }
+    
+    // PPMファイルとして保存
     std::ofstream ofs(filename);
     ofs << "P3\n" << width << " " << height << "\n255\n";
     for (const auto& row : image) {

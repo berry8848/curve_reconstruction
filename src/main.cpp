@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include "interpolators/interpolator.h"
 #include "interpolators/kalman_interpolator.h"
@@ -7,13 +8,11 @@
 
 int main() {
     std::vector<LineSegment> segments = {
-        {10, 50, 15, 52},
-        {20, 54, 25, 57},
-        {30, 59, 35, 63},
-        {40, 66, 45, 71},
-        {50, 75, 55, 80},
-        {60, 83, 65, 88},
-        {70, 90, 75, 94},
+        {-1.2, 12.2, -0.8, 11.8},
+        {-0.7, 11.65, -0.3, 10.85},
+        {-0.2, 10.6, 0.2, 9.4},
+        {0.8, 7, 1.2, 5},
+        {1.2, 5, 1.6, 2.68},
     };
     
     std::vector<std::pair<double, double>> points;
@@ -24,19 +23,27 @@ int main() {
     
     interpolator->fit(points);
     
+    std::string equation = interpolator->getDescription();
+    
     std::cout << "推定された曲線:" << std::endl;
-    std::cout << interpolator->getDescription() << std::endl;
+    std::cout << equation << std::endl;
+    
+    // 関数式をファイルに保存
+    std::ofstream eq_file("equation.txt");
+    eq_file << equation << std::endl;
+    eq_file.close();
     
     std::vector<std::pair<double, double>> curve_points;
-    for (double x = 0; x <= 100; x += 0.5) {
+    for (double x = -2; x <= 2; x += 0.01) {
         double y = interpolator->predict(x);
         curve_points.push_back({x, y});
     }
     
-    saveToPPM("lane_curve.ppm", points, curve_points);
+    saveToPPM("lane_curve.ppm", segments, curve_points);
     
     std::cout << "曲線画像を lane_curve.ppm として保存しました。" << std::endl;
-    std::cout << "赤い点: 入力線分から抽出された点" << std::endl;
+    std::cout << "関数式を equation.txt として保存しました。" << std::endl;
+    std::cout << "緑の線: 元の線分" << std::endl;
     std::cout << "青い線: 復元された曲線" << std::endl;
     
     return 0;
