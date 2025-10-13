@@ -39,7 +39,7 @@ int main() {
         curve_points.push_back({x, y});
     }
     
-    saveToPPM("output/lane_curve.ppm", segments, curve_points);
+    saveToPPM("output/lane_curve.ppm", segments, curve_points, 800, 600);
     
     std::cout << "曲線画像を lane_curve.ppm として保存しました。" << std::endl;
     std::cout << "関数式を equation.txt として保存しました。" << std::endl;
