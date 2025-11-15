@@ -19,5 +19,4 @@ public:
     // 補間結果の説明を取得
     virtual std::string getDescription() const = 0;
 };
-
 #endif // INTERPOLATOR_H
