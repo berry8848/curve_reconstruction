@@ -1,13 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include "../include/interpolators/interpolator.h"
-#include "../include/interpolators/kalman_interpolator.h"
-#include "../include/interpolators/line_segment.h"
-#include "../include/utils/image_utils.h"
+#include "interpolators/interpolator.h"
+#include "interpolators/kalman_interpolator.h"
+#include "interpolators/line_segment.h"
+#include "utils/image_utils.h"
 
 int main() {
-    // これはmain.cppと完全に同じコード
     std::vector<LineSegment> segments = {
         {-1.2, 12.2, -0.8, 11.8},
         {-0.7, 11.65, -0.3, 10.85},
@@ -30,7 +29,7 @@ int main() {
     std::cout << equation << std::endl;
     
     // 関数式をファイルに保存
-    std::ofstream eq_file("output/equation_simple_external.txt");
+    std::ofstream eq_file("output/equation_external.txt");
     eq_file << equation << std::endl;
     eq_file.close();
     
@@ -40,10 +39,10 @@ int main() {
         curve_points.push_back({x, y});
     }
     
-    saveToPPM("output/lane_curve_simple_external.ppm", segments, curve_points, 1000, 800);
+    saveToPPM("output/lane_curve_external.ppm", segments, curve_points, 1000, 800);
     
-    std::cout << "曲線画像を lane_curve_simple_external.ppm として保存しました。" << std::endl;
-    std::cout << "関数式を equation_simple_external.txt として保存しました。" << std::endl;
+    std::cout << "曲線画像を lane_curve_external.ppm として保存しました。" << std::endl;
+    std::cout << "関数式を equation_external.txt として保存しました。" << std::endl;
     std::cout << "緑の線: 元の線分" << std::endl;
     std::cout << "青い線: 復元された曲線" << std::endl;
     

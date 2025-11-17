@@ -17,14 +17,55 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 # インクルードディレクトリを指定
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# サブディレクトリを追加
-add_subdirectory(src/interpolators)
-add_subdirectory(src/utils)
+# ========================================
+# ライブラリの定義
+# ========================================
 
-# 実行ファイル
+# 補間手法のライブラリ
+add_library(interpolators SHARED
+    src/interpolators/kalman_interpolator.cpp
+)
+
+target_include_directories(interpolators 
+    PUBLIC 
+    ${PROJECT_SOURCE_DIR}/include
+)
+
+target_link_libraries(interpolators 
+    PUBLIC 
+    Eigen3::Eigen
+)
+
+# ライブラリのバージョン設定
+set_target_properties(interpolators PROPERTIES
+    VERSION 1.0.0
+    SOVERSION 1
+)
+
+# ユーティリティライブラリ
+add_library(utils SHARED
+    src/utils/line_segment.cpp
+    src/utils/image_utils.cpp
+)
+
+target_include_directories(utils 
+    PUBLIC 
+    ${PROJECT_SOURCE_DIR}/include
+)
+
+# ライブラリのバージョン設定
+set_target_properties(utils PROPERTIES
+    VERSION 1.0.0
+    SOVERSION 1
+)
+
+# ========================================
+# 実行ファイルの定義
+# ========================================
+
+# メイン実行ファイル
 add_executable(lane_curve src/main.cpp)
 
-# ライブラリをリンク
 target_link_libraries(lane_curve 
     PRIVATE 
     interpolators
@@ -32,7 +73,7 @@ target_link_libraries(lane_curve
     Eigen3::Eigen
 )
 
-# Simple External Application（共有ライブラリを使用）
+# External Application（共有ライブラリを使用）
 add_executable(external_app src/external_app.cpp)
 
 target_include_directories(external_app 
@@ -47,21 +88,29 @@ target_link_libraries(external_app
     Eigen3::Eigen
 )
 
-# RPATH設定
+# RPATH設定（実行時にライブラリを見つけられるようにする）
 set_target_properties(external_app PROPERTIES
-    BUILD_RPATH "${CMAKE_BINARY_DIR}/src/interpolators:${CMAKE_BINARY_DIR}/src/utils"
+    BUILD_RPATH "${CMAKE_BINARY_DIR}"
     INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
 )
 
+# ========================================
 # インストール設定
-install(TARGETS lane_curve external_app external_app DESTINATION bin)
+# ========================================
 
-# 共有ライブラリもインストール
+# 実行ファイルのインストール
+install(TARGETS lane_curve external_app 
+    DESTINATION bin
+)
+
+# 共有ライブラリのインストール
 install(TARGETS interpolators utils
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
 )
 
-# ヘッダーファイルもインストール
-install(DIRECTORY include/ DESTINATION include)
+# ヘッダーファイルのインストール
+install(DIRECTORY include/ 
+    DESTINATION include
+)
