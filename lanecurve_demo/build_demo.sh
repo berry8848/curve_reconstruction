@@ -37,7 +37,7 @@ echo "✓ Build Complete!"
 echo "=========================================="
 echo ""
 echo "Built applications:"
-ls -lh build/demo_main build/custom_app
+ls -lh build/demo_main
 
 echo ""
 echo "=========================================="
@@ -62,6 +62,17 @@ fi
 echo ""
 echo "Output files:"
 ls -lh output/
+
+# PPMをPNGに変換
+if command -v convert &> /dev/null; then
+    echo ""
+    echo "Converting to PNG..."
+    convert ./output/lane_curve.ppm ./output/lane_curve.png
+    echo "✓ PNG conversion complete"
+else
+    echo ""
+    echo "⚠ ImageMagick not found. Skipping PNG conversion."
+fi
 
 echo ""
 echo "=========================================="
