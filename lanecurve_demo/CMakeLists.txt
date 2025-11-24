@@ -1,116 +1,94 @@
 cmake_minimum_required(VERSION 3.10)
-project(LaneCurveRestoration VERSION 1.0 LANGUAGES CXX)
+project(LaneCurveDemo VERSION 1.0 LANGUAGES CXX)
 
 # C++17を要求
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 共有ライブラリのビルド設定
-option(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so)" ON)
-
-# Windows DLLのエクスポート設定
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-
 # Eigenライブラリを探す
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
+# ========================================
+# 外部ライブラリのパス設定
+# ========================================
+
+set(EXTERNAL_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/lib")
+set(EXTERNAL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/include")
+
+# ライブラリの存在確認
+if(NOT EXISTS "${EXTERNAL_LIB_DIR}/libinterpolators.so")
+    message(FATAL_ERROR 
+        "libinterpolators.so not found!\n"
+        "Please run: ./setup_libs.sh to copy libraries from liblanecurve/dist/")
+endif()
+
+if(NOT EXISTS "${EXTERNAL_LIB_DIR}/libutils.so")
+    message(FATAL_ERROR 
+        "libutils.so not found!\n"
+        "Please run: ./setup_libs.sh to copy libraries from liblanecurve/dist/")
+endif()
+
+message(STATUS "Using libraries from: ${EXTERNAL_LIB_DIR}")
+message(STATUS "Using headers from: ${EXTERNAL_INCLUDE_DIR}")
+
 # インクルードディレクトリを指定
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${EXTERNAL_INCLUDE_DIR})
 
 # ========================================
-# ライブラリの定義
+# 既存の共有ライブラリをインポート
 # ========================================
 
-# 補間手法のライブラリ
-add_library(interpolators SHARED
-    src/interpolators/kalman_interpolator.cpp
-)
-
-target_include_directories(interpolators 
-    PUBLIC 
-    ${PROJECT_SOURCE_DIR}/include
-)
-
-target_link_libraries(interpolators 
-    PUBLIC 
-    Eigen3::Eigen
-)
-
-# ライブラリのバージョン設定
+# interpolatorsライブラリ
+add_library(interpolators SHARED IMPORTED)
 set_target_properties(interpolators PROPERTIES
-    VERSION 1.0.0
-    SOVERSION 1
+    IMPORTED_LOCATION "${EXTERNAL_LIB_DIR}/libinterpolators.so"
+    INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_INCLUDE_DIR}"
 )
 
-# ユーティリティライブラリ
-add_library(utils SHARED
-    src/utils/line_segment.cpp
-    src/utils/image_utils.cpp
-)
-
-target_include_directories(utils 
-    PUBLIC 
-    ${PROJECT_SOURCE_DIR}/include
-)
-
-# ライブラリのバージョン設定
+# utilsライブラリ
+add_library(utils SHARED IMPORTED)
 set_target_properties(utils PROPERTIES
-    VERSION 1.0.0
-    SOVERSION 1
+    IMPORTED_LOCATION "${EXTERNAL_LIB_DIR}/libutils.so"
+    INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_INCLUDE_DIR}"
 )
 
 # ========================================
-# 実行ファイルの定義
+# デモアプリケーション
 # ========================================
 
-# メイン実行ファイル
-add_executable(lane_curve src/main.cpp)
+# メインデモ
+add_executable(demo_main src/demo_main.cpp)
 
-target_link_libraries(lane_curve 
+target_link_libraries(demo_main 
     PRIVATE 
     interpolators
     utils
     Eigen3::Eigen
 )
 
-# External Application（共有ライブラリを使用）
-add_executable(external_app src/external_app.cpp)
-
-target_include_directories(external_app 
-    PRIVATE 
-    ${PROJECT_SOURCE_DIR}/include
+# RPATH設定
+set_target_properties(demo_main PROPERTIES
+    BUILD_RPATH "${EXTERNAL_LIB_DIR}"
+    INSTALL_RPATH "$ORIGIN/../libs/lib"
 )
 
-target_link_libraries(external_app 
+# カスタムアプリケーション
+add_executable(custom_app src/custom_app.cpp)
+
+target_link_libraries(custom_app 
     PRIVATE 
     interpolators
     utils
     Eigen3::Eigen
 )
 
-# RPATH設定（実行時にライブラリを見つけられるようにする）
-set_target_properties(external_app PROPERTIES
-    BUILD_RPATH "${CMAKE_BINARY_DIR}"
-    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+set_target_properties(custom_app PROPERTIES
+    BUILD_RPATH "${EXTERNAL_LIB_DIR}"
+    INSTALL_RPATH "$ORIGIN/../libs/lib"
 )
 
 # ========================================
 # インストール設定
 # ========================================
 
-# 実行ファイルのインストール
-install(TARGETS lane_curve external_app 
-    DESTINATION bin
-)
-
-# 共有ライブラリのインストール
-install(TARGETS interpolators utils
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
-)
-
-# ヘッダーファイルのインストール
-install(DIRECTORY include/ 
-    DESTINATION include
-)
+install(TARGETS demo_main custom_app DESTINATION bin)
