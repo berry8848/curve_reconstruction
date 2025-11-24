@@ -72,23 +72,23 @@ set_target_properties(demo_main PROPERTIES
     INSTALL_RPATH "$ORIGIN/../libs/lib"
 )
 
-# カスタムアプリケーション
-add_executable(custom_app src/custom_app.cpp)
+# # カスタムアプリケーション
+# add_executable(custom_app src/custom_app.cpp)
 
-target_link_libraries(custom_app 
-    PRIVATE 
-    interpolators
-    utils
-    Eigen3::Eigen
-)
+# target_link_libraries(custom_app 
+#     PRIVATE 
+#     interpolators
+#     utils
+#     Eigen3::Eigen
+# )
 
-set_target_properties(custom_app PROPERTIES
-    BUILD_RPATH "${EXTERNAL_LIB_DIR}"
-    INSTALL_RPATH "$ORIGIN/../libs/lib"
-)
+# set_target_properties(custom_app PROPERTIES
+#     BUILD_RPATH "${EXTERNAL_LIB_DIR}"
+#     INSTALL_RPATH "$ORIGIN/../libs/lib"
+# )
 
 # ========================================
 # インストール設定
 # ========================================
 
-install(TARGETS demo_main custom_app DESTINATION bin)
+install(TARGETS demo_main DESTINATION bin)
