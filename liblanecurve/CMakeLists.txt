@@ -29,11 +29,11 @@ target_link_libraries(interpolators
     Eigen3::Eigen
 )
 
-set_target_properties(interpolators PROPERTIES
-    VERSION 1.0.0
-    SOVERSION 1
-    PUBLIC_HEADER "include/interpolators/interpolator.h;include/interpolators/kalman_interpolator.h;include/interpolators/line_segment.h"
-)
+# set_target_properties(interpolators PROPERTIES
+#     VERSION 1.0.0
+#     SOVERSION 1
+#     PUBLIC_HEADER "include/interpolators/interpolator.h;include/interpolators/kalman_interpolator.h;include/interpolators/line_segment.h"
+# )
 
 # ========================================
 # ユーティリティライブラリ
@@ -49,23 +49,23 @@ target_include_directories(utils
     $<INSTALL_INTERFACE:include>
 )
 
-set_target_properties(utils PROPERTIES
-    VERSION 1.0.0
-    SOVERSION 1
-    PUBLIC_HEADER "include/utils/image_utils.h"
-)
+# set_target_properties(utils PROPERTIES
+#     VERSION 1.0.0
+#     SOVERSION 1
+#     PUBLIC_HEADER "include/utils/image_utils.h"
+# )
 
 # ========================================
 # インストール設定
 # ========================================
-install(TARGETS interpolators utils
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
-    PUBLIC_HEADER DESTINATION include
-)
+# install(TARGETS interpolators utils
+#     LIBRARY DESTINATION lib
+#     ARCHIVE DESTINATION lib
+#     RUNTIME DESTINATION bin
+#     PUBLIC_HEADER DESTINATION include
+# )
 
-install(DIRECTORY include/ 
-    DESTINATION include
-    FILES_MATCHING PATTERN "*.h"
-)
+# install(DIRECTORY include/ 
+#     DESTINATION include
+#     FILES_MATCHING PATTERN "*.h"
+# )

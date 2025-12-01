@@ -73,9 +73,3 @@ else
     echo ""
     echo "⚠ ImageMagick not found. Skipping PNG conversion."
 fi
-
-echo ""
-echo "=========================================="
-echo "To run custom_app:"
-echo "  ./build/custom_app"
-echo "=========================================="
