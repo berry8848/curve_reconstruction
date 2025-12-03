@@ -39,8 +39,9 @@ class Point(ctypes.Structure):
 
 def load_libraries():
     """共有ライブラリを読み込む"""
-    # ライブラリのパスを取得
-    lib_dir = Path(__file__).parent
+    # ライブラリのパスを取得（libディレクトリから）
+    script_dir = Path(__file__).parent
+    lib_dir = script_dir / "lib"
     
     # libutils.soを読み込み
     utils_lib_path = lib_dir / "libutils.so"
@@ -65,8 +66,8 @@ def setup_function_signatures(utils_lib, interpolators_lib):
     """C++関数のシグネチャを設定"""
     
     # extractPoints関数
-    # void extractPoints(const std::vector<LineSegment>& segments, 
-    #                    std::vector<std::pair<double, double>>& points);
+    # void extractPoints(const CLineSegment* segments, int num_segments,
+    #                    CPoint* points, int* num_points);
     utils_lib.extractPoints.argtypes = [
         ctypes.POINTER(LineSegment),
         ctypes.c_int,
@@ -76,9 +77,9 @@ def setup_function_signatures(utils_lib, interpolators_lib):
     utils_lib.extractPoints.restype = None
     
     # saveToPPM関数
-    # void saveToPPM(const std::string& filename, 
-    #                const std::vector<LineSegment>& segments,
-    #                const std::vector<std::pair<double, double>>& curve_points,
+    # void saveToPPM(const char* filename,
+    #                const CLineSegment* segments, int num_segments,
+    #                const CPoint* curve_points, int num_curve_points,
     #                int width, int height);
     utils_lib.saveToPPM.argtypes = [
         ctypes.c_char_p,
@@ -92,7 +93,7 @@ def setup_function_signatures(utils_lib, interpolators_lib):
     utils_lib.saveToPPM.restype = None
     
     # KalmanInterpolatorの作成
-    # KalmanInterpolator* createKalmanInterpolator(double process_noise, double observation_noise);
+    # void* createKalmanInterpolator(double process_noise, double observation_noise);
     interpolators_lib.createKalmanInterpolator.argtypes = [
         ctypes.c_double,
         ctypes.c_double
@@ -100,7 +101,7 @@ def setup_function_signatures(utils_lib, interpolators_lib):
     interpolators_lib.createKalmanInterpolator.restype = ctypes.c_void_p
     
     # fit関数
-    # void fit(KalmanInterpolator* interpolator, const Point* points, int num_points);
+    # void fit(void* interpolator, const CPoint* points, int num_points);
     interpolators_lib.fit.argtypes = [
         ctypes.c_void_p,
         ctypes.POINTER(Point),
@@ -109,7 +110,7 @@ def setup_function_signatures(utils_lib, interpolators_lib):
     interpolators_lib.fit.restype = None
     
     # predict関数
-    # double predict(KalmanInterpolator* interpolator, double x);
+    # double predict(void* interpolator, double x);
     interpolators_lib.predict.argtypes = [
         ctypes.c_void_p,
         ctypes.c_double
@@ -117,12 +118,12 @@ def setup_function_signatures(utils_lib, interpolators_lib):
     interpolators_lib.predict.restype = ctypes.c_double
     
     # getDescription関数
-    # const char* getDescription(KalmanInterpolator* interpolator);
+    # const char* getDescription(void* interpolator);
     interpolators_lib.getDescription.argtypes = [ctypes.c_void_p]
     interpolators_lib.getDescription.restype = ctypes.c_char_p
     
     # deleteKalmanInterpolator関数
-    # void deleteKalmanInterpolator(KalmanInterpolator* interpolator);
+    # void deleteKalmanInterpolator(void* interpolator);
     interpolators_lib.deleteKalmanInterpolator.argtypes = [ctypes.c_void_p]
     interpolators_lib.deleteKalmanInterpolator.restype = None
 
