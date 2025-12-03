@@ -1,8 +1,8 @@
 #include "utils/image_utils.h"
+#include <array>
 #include <fstream>
 #include <algorithm>
 #include <cmath>
-#include <array>
 
 void saveToPPM(const std::string& filename, 
                const std::vector<LineSegment>& segments,
@@ -14,9 +14,8 @@ void saveToPPM(const std::string& filename,
         height, std::vector<std::array<int, 3>>(width, {255, 255, 255})
     );
     
-    // データ範囲を計算
-    double min_x = 1e9, max_x = -1e9;
-    double min_y = 1e9, max_y = -1e9;
+    // データの範囲を計算
+    double min_x = 1e9, max_x = -1e9, min_y = 1e9, max_y = -1e9;
     
     for (const auto& seg : segments) {
         min_x = std::min({min_x, seg.x1, seg.x2});
