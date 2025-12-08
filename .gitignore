@@ -1,3 +1,4 @@
 build/
 output/
 python/python_lanecurve_demo/lib/*.so*
+cpp/lanecurve_demo/libs/lib/*.so*
